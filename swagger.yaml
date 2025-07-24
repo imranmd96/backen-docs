@@ -1,7 +1,7 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
   title: ForkLine API Gateway
-  version: "1.0.0"
+  version: 1.0.0
 host: c3afb43921bc.ngrok-free.app
 schemes:
   - https
@@ -12,7 +12,7 @@ paths:
       summary: Health check
       description: Returns API Gateway status
       responses:
-        200:
+        '200':
           description: API Gateway is running
           schema:
             type: object
@@ -20,4 +20,4 @@ paths:
               status:
                 type: string
               message:
-                type: string 
+                type: string
