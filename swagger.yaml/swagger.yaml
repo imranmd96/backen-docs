@@ -1,0 +1,21 @@
+openapi: 3.0.0
+info:
+  title: ForkLine API Gateway
+  version: "1.0.0"
+servers:
+  - url: https://c3afb43921bc.ngrok-free.app
+paths:
+  <<: 
+    $ref: '../backend 03-52-48-217/auth-service/auth.swagger.yaml#/paths'
+  <<: 
+    $ref: '../backend 03-52-48-217/user-service/user.swagger.yaml#/paths'
+  <<: 
+    $ref: '../backend 03-52-48-217/api-gateway/api-gateway.swagger.yaml#/paths'
+components:
+  schemas:
+    <<: 
+      $ref: '../backend 03-52-48-217/auth-service/auth.swagger.yaml#/components/schemas'
+    <<: 
+      $ref: '../backend 03-52-48-217/user-service/user.swagger.yaml#/components/schemas'
+    <<: 
+      $ref: '../backend 03-52-48-217/api-gateway/api-gateway.swagger.yaml#/components/schemas' 
