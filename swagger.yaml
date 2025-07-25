@@ -1,23 +1,590 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
   title: ForkLine API Gateway
-  version: 1.0.0
+  version: "1.0.0"
+  description: Complete API documentation for ForkLine Auth and User services
 host: c3afb43921bc.ngrok-free.app
 schemes:
   - https
 basePath: /
 paths:
+  # API Gateway Health Check
   /health:
     get:
-      summary: Health check
+      summary: API Gateway Health Check
       description: Returns API Gateway status
+      tags:
+        - Health
       responses:
-        '200':
+        200:
           description: API Gateway is running
           schema:
             type: object
             properties:
               status:
                 type: string
+                example: "success"
               message:
                 type: string
+                example: "API Gateway is running"
+
+  /test-health:
+    post:
+      summary: Test Health Check
+      description: Test endpoint for API Gateway
+      tags:
+        - Health
+      responses:
+        200:
+          description: API Gateway test successful
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "success"
+              message:
+                type: string
+                example: "API Gateway is running"
+
+  # Auth Service APIs
+  /api/auth/register:
+    post:
+      summary: User Registration
+      description: Register a new user account
+      tags:
+        - Authentication
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/RegisterRequest'
+      responses:
+        201:
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/RegisterResponse'
+        400:
+          description: Bad request - validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /api/auth/login:
+    post:
+      summary: User Login
+      description: Authenticate user and get access tokens
+      tags:
+        - Authentication
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+                format: email
+                example: "user@example.com"
+              password:
+                type: string
+                minLength: 6
+                example: "password123"
+      responses:
+        200:
+          description: Login successful
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        401:
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /api/auth/refresh-token:
+    post:
+      summary: Refresh Access Token
+      description: Get new access token using refresh token
+      tags:
+        - Authentication
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/RefreshTokenRequest'
+      responses:
+        200:
+          description: Token refreshed successfully
+          schema:
+            $ref: '#/definitions/RefreshTokenResponse'
+        401:
+          description: Invalid refresh token
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /api/auth/logout:
+    post:
+      summary: User Logout
+      description: Logout user and invalidate refresh token
+      tags:
+        - Authentication
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/LogoutRequest'
+      responses:
+        200:
+          description: Logout successful
+          schema:
+            $ref: '#/definitions/LogoutResponse'
+
+  /api/auth/update-password:
+    post:
+      summary: Update Password
+      description: Update user password (requires authentication)
+      tags:
+        - Authentication
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/UpdatePasswordRequest'
+      responses:
+        200:
+          description: Password updated successfully
+          schema:
+            $ref: '#/definitions/UpdatePasswordResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /api/auth/profile:
+    patch:
+      summary: Update Profile
+      description: Update user profile information (requires authentication)
+      tags:
+        - Authentication
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateProfileRequest'
+      responses:
+        200:
+          description: Profile updated successfully
+          schema:
+            $ref: '#/definitions/UpdateProfileResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /api/auth/health:
+    get:
+      summary: Auth Service Health Check
+      description: Check auth service status
+      tags:
+        - Health
+      responses:
+        200:
+          description: Auth service is running
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "ok"
+              message:
+                type: string
+                example: "Auth service is running"
+
+  # User Service APIs
+  /api/users/profile:
+    get:
+      summary: Get User Profile
+      description: Get current user profile (requires authentication)
+      tags:
+        - User
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: User profile retrieved successfully
+          schema:
+            $ref: '#/definitions/UserProfileResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+    patch:
+      summary: Update User Profile
+      description: Update user profile information (requires authentication)
+      tags:
+        - User
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateUserProfileRequest'
+      responses:
+        200:
+          description: Profile updated successfully
+          schema:
+            $ref: '#/definitions/UserProfileResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /api/users/profile/avatar:
+    post:
+      summary: Upload Avatar
+      description: Upload user profile picture (requires authentication)
+      tags:
+        - User
+      security:
+        - Bearer: []
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: avatar
+          type: file
+          required: true
+          description: Profile picture file
+      responses:
+        200:
+          description: Avatar uploaded successfully
+          schema:
+            $ref: '#/definitions/AvatarUploadResponse'
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+    get:
+      summary: Get Avatar
+      description: Get user profile picture (requires authentication)
+      tags:
+        - User
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Avatar image
+          schema:
+            type: file
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: Avatar not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /api/users/health:
+    get:
+      summary: User Service Health Check
+      description: Check user service status
+      tags:
+        - Health
+      responses:
+        200:
+          description: User service is running
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "success"
+              message:
+                type: string
+                example: "User Service is running"
+
+definitions:
+  # Auth Service Definitions
+  RegisterRequest:
+    type: object
+    required:
+      - email
+      - password
+      - name
+      - phone
+    properties:
+      email:
+        type: string
+        format: email
+        example: "user@example.com"
+      password:
+        type: string
+        minLength: 6
+        example: "password123"
+      name:
+        type: string
+        example: "John Doe"
+      phone:
+        type: string
+        example: "+1234567890"
+      role:
+        type: string
+        enum: [user, admin, restaurant_owner]
+        default: user
+        example: "user"
+
+  RegisterResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      message:
+        type: string
+        example: "User registered successfully"
+      userId:
+        type: string
+        example: "507f1f77bcf86cd799439011"
+      email:
+        type: string
+        example: "user@example.com"
+      role:
+        type: string
+        example: "user"
+      tokens:
+        $ref: '#/definitions/Tokens'
+
+  LoginResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      data:
+        type: object
+        properties:
+          user:
+            $ref: '#/definitions/User'
+          tokens:
+            $ref: '#/definitions/Tokens'
+
+  RefreshTokenRequest:
+    type: object
+    required:
+      - refreshToken
+    properties:
+      refreshToken:
+        type: string
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+  RefreshTokenResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      data:
+        type: object
+        properties:
+          tokens:
+            $ref: '#/definitions/Tokens'
+
+  LogoutRequest:
+    type: object
+    required:
+      - refreshToken
+    properties:
+      refreshToken:
+        type: string
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+  LogoutResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      message:
+        type: string
+        example: "Logged out successfully"
+
+  UpdatePasswordRequest:
+    type: object
+    required:
+      - currentPassword
+      - newPassword
+    properties:
+      currentPassword:
+        type: string
+        example: "oldpassword123"
+      newPassword:
+        type: string
+        minLength: 6
+        example: "newpassword123"
+
+  UpdatePasswordResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      message:
+        type: string
+        example: "Password updated successfully"
+
+  UpdateProfileRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        example: "John Doe"
+      phone:
+        type: string
+        example: "+1234567890"
+
+  UpdateProfileResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      data:
+        type: object
+        properties:
+          user:
+            $ref: '#/definitions/User'
+
+  # User Service Definitions
+  UpdateUserProfileRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        example: "John Doe"
+      phone:
+        type: string
+        example: "+1234567890"
+      address:
+        type: string
+        example: "123 Main St, City, Country"
+      preferences:
+        $ref: '#/definitions/UserPreferences'
+
+  UserProfileResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      data:
+        type: object
+        properties:
+          user:
+            $ref: '#/definitions/User'
+
+  AvatarUploadResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "success"
+      user:
+        $ref: '#/definitions/User'
+
+  # Common Definitions
+  User:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "507f1f77bcf86cd799439011"
+      name:
+        type: string
+        example: "John Doe"
+      email:
+        type: string
+        format: email
+        example: "user@example.com"
+      phone:
+        type: string
+        example: "+1234567890"
+      address:
+        type: string
+        example: "123 Main St, City, Country"
+      role:
+        type: string
+        enum: [user, admin, restaurant_owner]
+        example: "user"
+      preferences:
+        $ref: '#/definitions/UserPreferences'
+      createdAt:
+        type: string
+        format: date-time
+        example: "2023-01-01T00:00:00.000Z"
+      updatedAt:
+        type: string
+        format: date-time
+        example: "2023-01-01T00:00:00.000Z"
+
+  UserPreferences:
+    type: object
+    properties:
+      notifications:
+        type: boolean
+        default: true
+        example: true
+      language:
+        type: string
+        default: "en"
+        example: "en"
+      theme:
+        type: string
+        default: "light"
+        example: "light"
+
+  Tokens:
+    type: object
+    properties:
+      accessToken:
+        type: string
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      refreshToken:
+        type: string
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+  ErrorResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: "error"
+      message:
+        type: string
+        example: "Error message"
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: "Bearer token for authentication"
