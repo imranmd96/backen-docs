@@ -3,10 +3,17 @@ info:
   title: ForkLine API Gateway
   version: "1.0.0"
   description: Complete API documentation for ForkLine Auth and User services
+  contact:
+    name: API Support
+    url: https://c3afb43921bc.ngrok-free.app
 host: c3afb43921bc.ngrok-free.app
 schemes:
   - https
 basePath: /
+consumes:
+  - application/json
+produces:
+  - application/json
 paths:
   # API Gateway Health Check
   /health:
