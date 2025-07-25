@@ -5,8 +5,8 @@ info:
   description: Complete API documentation for ForkLine Auth and User services
   contact:
     name: API Support
-    url: https://c3afb43921bc.ngrok-free.app
-host: c3afb43921bc.ngrok-free.app
+    url: https://d18307065b31.ngrok-free.app
+host: d18307065b31.ngrok-free.app
 schemes:
   - https
 basePath: /
